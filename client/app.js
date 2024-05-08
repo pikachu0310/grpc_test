@@ -5,13 +5,13 @@ const client = new PingPongServiceClient('http://localhost:8080', null, null);
 
 function startPingPong() {
   const stream = client.streamPingPong();
-  stream.on('data', function(response) {
+  stream.on('data', function (response) {
     const message = document.createElement('li');
     message.textContent = `Received: ${response.getMessage()}`;
     document.getElementById('messages').appendChild(message);
   });
 
-  stream.on('status', function(status) {
+  stream.on('status', function (status) {
     if (status.code !== grpc.Code.OK) {
       console.log('Error status: ' + status.details);
     }
@@ -24,7 +24,7 @@ function startPingPong() {
     stream.write(request);
   }, 1000);
 
-  stream.on('end', function(end) {
+  stream.on('end', function (end) {
     // stream end signal
   });
 }
