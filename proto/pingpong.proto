@@ -2,21 +2,17 @@ syntax = "proto3";
 
 package pingpong;
 
-// Go のパッケージ情報を指定
 option go_package = "github.com/pikachu0310/grpc_test/pingpong";
 
-// PingPongService は ping リクエストに pong を返すサービスです。
 service PingPongService {
-  // SendPing は Ping メッセージを受け取り、Pong メッセージを返します。
   rpc SendPing(Ping) returns (Pong);
+  rpc StreamPingPong(stream Ping) returns (stream Pong);
 }
 
-// Ping はクライアントからのリクエストを表します。
 message Ping {
   string message = 1;
 }
 
-// Pong はサーバーからのレスポンスを表します。
 message Pong {
   string message = 1;
 }
