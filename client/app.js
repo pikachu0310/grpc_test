@@ -28,3 +28,6 @@ function startPingPong() {
     // stream end signal
   });
 }
+
+// 関数をグローバルスコープに追加
+window.startPingPong = startPingPong;
