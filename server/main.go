@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "github.com/pikachu0310/grpc_test/server/proto"
-	"google.golang.org/grpc"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"time"
+
+	pb "github.com/pikachu0310/grpc_test/server/proto"
+	"google.golang.org/grpc"
 )
 
 type server struct {
@@ -62,14 +65,31 @@ func (s *server) PingAndStreamPong(req *pb.Ping, stream pb.PingPongService_PingA
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
+	_, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
-	pb.RegisterPingPongServiceServer(s, &server{})
-	log.Println("Server is running on port 50051")
-	if err := s.Serve(lis); err != nil {
+	grpcServer := grpc.NewServer()
+	pb.RegisterPingPongServiceServer(grpcServer, &server{})
+
+	wrappedGrpc := grpcweb.WrapServer(grpcServer, grpcweb.WithCorsForRegisteredEndpointsOnly(false), grpcweb.WithOriginFunc(func(origin string) bool {
+		// Allow all origins, adjust in production environment as needed
+		return true
+	}))
+
+	httpServer := &http.Server{
+		Addr: ":8080", // Separate port for wrapped gRPC-Web server
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsGrpcWebSocketRequest(r) {
+				wrappedGrpc.ServeHTTP(w, r)
+			} else {
+				http.NotFound(w, r)
+			}
+		}),
+	}
+
+	log.Println("gRPC-Web server is running on port 8080")
+	if err := httpServer.ListenAndServe(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
