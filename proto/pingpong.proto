@@ -7,6 +7,8 @@ option go_package = "github.com/pikachu0310/grpc_test/pingpong";
 service PingPongService {
   rpc SendPing(Ping) returns (Pong);
   rpc StreamPingPong(stream Ping) returns (stream Pong);
+  rpc ReceivePongStream(Empty) returns (stream Pong);
+  rpc PingAndStreamPong(Ping) returns (stream Pong);
 }
 
 message Ping {
@@ -16,3 +18,6 @@ message Ping {
 message Pong {
   string message = 1;
 }
+
+// Empty message for operations where no input is required.
+message Empty {}
