@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
+	pb "github.com/pikachu0310/grpc_test/server/proto"
+	"google.golang.org/grpc"
 	"io"
 	"log"
 	"net"
-
-	pb "github.com/pikachu0310/grpc_test/server/proto"
-	"google.golang.org/grpc"
+	"time"
 )
 
 type server struct {
@@ -35,6 +36,29 @@ func (s *server) StreamPingPong(stream pb.PingPongService_StreamPingPongServer) 
 			return err
 		}
 	}
+}
+
+func (s *server) ReceivePongStream(req *pb.Empty, stream pb.PingPongService_ReceivePongStreamServer) error {
+	for {
+		// ここでは例として、1秒ごとにPongメッセージを送信
+		time.Sleep(1 * time.Second)
+		if err := stream.Send(&pb.Pong{Message: "Pong from stream"}); err != nil {
+			log.Fatalf("Failed to send pong stream: %v", err)
+			return err
+		}
+	}
+}
+
+func (s *server) PingAndStreamPong(req *pb.Ping, stream pb.PingPongService_PingAndStreamPongServer) error {
+	for i := 0; i < 10; i++ { // ここでは例として、10回Pongメッセージを送信
+		time.Sleep(500 * time.Millisecond) // 少し間隔を開ける
+		pongMsg := fmt.Sprintf("Pong for %s", req.Message)
+		if err := stream.Send(&pb.Pong{Message: pongMsg}); err != nil {
+			log.Fatalf("Failed to send pong for ping: %v", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func main() {
