@@ -1,11 +1,12 @@
 const path = require('path');
+const webpack = require('webpack');  // webpackをインポート
 
 module.exports = {
-  mode: 'development',  // ローカル開発用設定
-  entry: './app.js',
+  mode: 'development',
+  entry: './app.js',  // app.jsの正確なパスを指定してください
   output: {
-    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
   },
   module: {
     rules: [
@@ -15,10 +16,21 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env'],
-          },
-        },
-      },
-    ],
+            presets: ['@babel/preset-env']
+          }
+        }
+      }
+    ]
   },
+  resolve: {
+    fallback: {
+      "stream": require.resolve("stream-browserify"),
+      "buffer": require.resolve("buffer/")
+    }
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    })
+  ]
 };
