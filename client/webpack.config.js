@@ -2,6 +2,8 @@ const path = require('path');
 const webpack = require('webpack');  // webpackをインポート
 const dotenv = require('dotenv');
 
+dotenv.config();
+
 module.exports = {
   mode: 'development',
   entry: './app.js',  // app.jsの正確なパスを指定してください
@@ -32,7 +34,6 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-      'process.env.GRPC_SERVER_URL': JSON.stringify(process.env.GRPC_SERVER_URL)
     }),
     new webpack.DefinePlugin({
       'process.env.GRPC_SERVER_URL': JSON.stringify(process.env.GRPC_SERVER_URL)
