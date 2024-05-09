@@ -33,7 +33,7 @@ proto.pingpong = require('./pingpong_pb.js');
 proto.pingpong.PingPongServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -59,7 +59,7 @@ proto.pingpong.PingPongServiceClient =
 proto.pingpong.PingPongServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -132,6 +132,118 @@ proto.pingpong.PingPongServicePromiseClient.prototype.sendPing =
       request,
       metadata || {},
       methodDescriptor_PingPongService_SendPing);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.pingpong.Empty,
+ *   !proto.pingpong.Pong>}
+ */
+const methodDescriptor_PingPongService_ReceivePongStream = new grpc.web.MethodDescriptor(
+  '/pingpong.PingPongService/ReceivePongStream',
+  grpc.web.MethodType.SERVER_STREAMING,
+  proto.pingpong.Empty,
+  proto.pingpong.Pong,
+  /**
+   * @param {!proto.pingpong.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.pingpong.Pong.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.pingpong.Empty} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.pingpong.Pong>}
+ *     The XHR Node Readable Stream
+ */
+proto.pingpong.PingPongServiceClient.prototype.receivePongStream =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/pingpong.PingPongService/ReceivePongStream',
+      request,
+      metadata || {},
+      methodDescriptor_PingPongService_ReceivePongStream);
+};
+
+
+/**
+ * @param {!proto.pingpong.Empty} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.pingpong.Pong>}
+ *     The XHR Node Readable Stream
+ */
+proto.pingpong.PingPongServicePromiseClient.prototype.receivePongStream =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/pingpong.PingPongService/ReceivePongStream',
+      request,
+      metadata || {},
+      methodDescriptor_PingPongService_ReceivePongStream);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.pingpong.Ping,
+ *   !proto.pingpong.Pong>}
+ */
+const methodDescriptor_PingPongService_PingAndStreamPong = new grpc.web.MethodDescriptor(
+  '/pingpong.PingPongService/PingAndStreamPong',
+  grpc.web.MethodType.SERVER_STREAMING,
+  proto.pingpong.Ping,
+  proto.pingpong.Pong,
+  /**
+   * @param {!proto.pingpong.Ping} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.pingpong.Pong.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.pingpong.Ping} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.pingpong.Pong>}
+ *     The XHR Node Readable Stream
+ */
+proto.pingpong.PingPongServiceClient.prototype.pingAndStreamPong =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/pingpong.PingPongService/PingAndStreamPong',
+      request,
+      metadata || {},
+      methodDescriptor_PingPongService_PingAndStreamPong);
+};
+
+
+/**
+ * @param {!proto.pingpong.Ping} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.pingpong.Pong>}
+ *     The XHR Node Readable Stream
+ */
+proto.pingpong.PingPongServicePromiseClient.prototype.pingAndStreamPong =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/pingpong.PingPongService/PingAndStreamPong',
+      request,
+      metadata || {},
+      methodDescriptor_PingPongService_PingAndStreamPong);
 };
 
 

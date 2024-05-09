@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-    <meta charset='UTF-8'>
+    <meta charset="UTF-8">
     <title>gRPC Web PingPong</title>
+    <style>
+        button { margin-top: 10px; }
+    </style>
 </head>
 <body>
 <h1>gRPC Web PingPong Test</h1>
-<button onclick='startPingPong()'>Start PingPong</button>
-<ul id='messages'></ul>
+<button onclick="sendPing()">Send Ping</button>
+<ul id="messages"></ul>
 
 <!-- バンドルされたスクリプトを読み込む -->
-<script src='./dist/bundle.js'></script>
+<script src="./dist/bundle.js"></script>
 </body>
 </html>

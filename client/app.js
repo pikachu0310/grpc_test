@@ -1,33 +1,52 @@
-const {Ping, Pong} = require('./pingpong_pb.js');
-const {PingPongServiceClient} = require('./pingpong_grpc_web_pb.js');
+const grpc = require('grpc-web');
+const { Empty, Ping } = require('./pingpong_pb.js');
+const { PingPongServiceClient } = require('./pingpong_grpc_web_pb.js');
 
 const client = new PingPongServiceClient('http://localhost:8080', null, null);
 
-function startPingPong() {
-  const stream = client.streamPingPong();
-  stream.on('data', function (response) {
+function listenForPongs() {
+  const emptyRequest = new Empty();
+  const stream = client.receivePongStream(emptyRequest);
+
+  stream.on('data', function(response) {
     const message = document.createElement('li');
-    message.textContent = `Received: ${response.getMessage()}`;
+    message.textContent = `Received Pong: ${response.getMessage()}`;
     document.getElementById('messages').appendChild(message);
   });
 
-  stream.on('status', function (status) {
-    if (status.code !== grpc.Code.OK) {
-      console.log('Error status: ' + status.details);
+  stream.on('status', function(status) {
+    if (status.code !== grpc.StatusCode.OK) {
+      console.error('Stream status error:', status.details);
     }
   });
 
-  // Send pings continuously
-  setInterval(() => {
-    const request = new Ping();
-    request.setMessage("Ping");
-    stream.write(request);
-  }, 1000);
-
-  stream.on('end', function (end) {
-    // stream end signal
+  stream.on('end', function() {
+    console.log('Stream ended');
   });
 }
 
-// 関数をグローバルスコープに追加
-window.startPingPong = startPingPong;
+function sendPing() {
+  const pingRequest = new Ping();
+  pingRequest.setMessage("Ping");
+  const stream = client.pingAndStreamPong(pingRequest);
+
+  stream.on('data', function(response) {
+    const message = document.createElement('li');
+    message.textContent = `Received Pong for Ping: ${response.getMessage()}`;
+    document.getElementById('messages').appendChild(message);
+  });
+
+  stream.on('status', function(status) {
+    if (status.code !== grpc.StatusCode.OK) {
+      console.error('Error status:', status.details);
+    }
+  });
+
+  stream.on('end', function() {
+    console.log('Stream from Ping ended');
+  });
+}
+
+// ウェブページがロードされたときにPongを受け取るように設定
+window.addEventListener('load', listenForPongs);
+window.sendPing = sendPing;
