@@ -1,4 +1,4 @@
-module github.com/pikachu0310/grpc_test
+module github.com/pikachu0310/grpc_test/server
 
 go 1.21.4
 

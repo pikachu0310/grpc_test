@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: proto/pingpong.proto
+// source: pingpong.proto
 
 package pingpong
 
@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type PingPongServiceClient interface {
 	SendPing(ctx context.Context, in *Ping, opts ...grpc.CallOption) (*Pong, error)
 	StreamPingPong(ctx context.Context, opts ...grpc.CallOption) (PingPongService_StreamPingPongClient, error)
+	ReceivePongStream(ctx context.Context, in *Empty, opts ...grpc.CallOption) (PingPongService_ReceivePongStreamClient, error)
+	PingAndStreamPong(ctx context.Context, in *Ping, opts ...grpc.CallOption) (PingPongService_PingAndStreamPongClient, error)
 }
 
 type pingPongServiceClient struct {
@@ -74,12 +76,78 @@ func (x *pingPongServiceStreamPingPongClient) Recv() (*Pong, error) {
 	return m, nil
 }
 
+func (c *pingPongServiceClient) ReceivePongStream(ctx context.Context, in *Empty, opts ...grpc.CallOption) (PingPongService_ReceivePongStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PingPongService_ServiceDesc.Streams[1], "/pingpong.PingPongService/ReceivePongStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &pingPongServiceReceivePongStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PingPongService_ReceivePongStreamClient interface {
+	Recv() (*Pong, error)
+	grpc.ClientStream
+}
+
+type pingPongServiceReceivePongStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *pingPongServiceReceivePongStreamClient) Recv() (*Pong, error) {
+	m := new(Pong)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *pingPongServiceClient) PingAndStreamPong(ctx context.Context, in *Ping, opts ...grpc.CallOption) (PingPongService_PingAndStreamPongClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PingPongService_ServiceDesc.Streams[2], "/pingpong.PingPongService/PingAndStreamPong", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &pingPongServicePingAndStreamPongClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PingPongService_PingAndStreamPongClient interface {
+	Recv() (*Pong, error)
+	grpc.ClientStream
+}
+
+type pingPongServicePingAndStreamPongClient struct {
+	grpc.ClientStream
+}
+
+func (x *pingPongServicePingAndStreamPongClient) Recv() (*Pong, error) {
+	m := new(Pong)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // PingPongServiceServer is the server API for PingPongService service.
 // All implementations must embed UnimplementedPingPongServiceServer
 // for forward compatibility
 type PingPongServiceServer interface {
 	SendPing(context.Context, *Ping) (*Pong, error)
 	StreamPingPong(PingPongService_StreamPingPongServer) error
+	ReceivePongStream(*Empty, PingPongService_ReceivePongStreamServer) error
+	PingAndStreamPong(*Ping, PingPongService_PingAndStreamPongServer) error
 	mustEmbedUnimplementedPingPongServiceServer()
 }
 
@@ -92,6 +160,12 @@ func (UnimplementedPingPongServiceServer) SendPing(context.Context, *Ping) (*Pon
 }
 func (UnimplementedPingPongServiceServer) StreamPingPong(PingPongService_StreamPingPongServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamPingPong not implemented")
+}
+func (UnimplementedPingPongServiceServer) ReceivePongStream(*Empty, PingPongService_ReceivePongStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReceivePongStream not implemented")
+}
+func (UnimplementedPingPongServiceServer) PingAndStreamPong(*Ping, PingPongService_PingAndStreamPongServer) error {
+	return status.Errorf(codes.Unimplemented, "method PingAndStreamPong not implemented")
 }
 func (UnimplementedPingPongServiceServer) mustEmbedUnimplementedPingPongServiceServer() {}
 
@@ -150,6 +224,48 @@ func (x *pingPongServiceStreamPingPongServer) Recv() (*Ping, error) {
 	return m, nil
 }
 
+func _PingPongService_ReceivePongStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(PingPongServiceServer).ReceivePongStream(m, &pingPongServiceReceivePongStreamServer{stream})
+}
+
+type PingPongService_ReceivePongStreamServer interface {
+	Send(*Pong) error
+	grpc.ServerStream
+}
+
+type pingPongServiceReceivePongStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *pingPongServiceReceivePongStreamServer) Send(m *Pong) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _PingPongService_PingAndStreamPong_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Ping)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(PingPongServiceServer).PingAndStreamPong(m, &pingPongServicePingAndStreamPongServer{stream})
+}
+
+type PingPongService_PingAndStreamPongServer interface {
+	Send(*Pong) error
+	grpc.ServerStream
+}
+
+type pingPongServicePingAndStreamPongServer struct {
+	grpc.ServerStream
+}
+
+func (x *pingPongServicePingAndStreamPongServer) Send(m *Pong) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // PingPongService_ServiceDesc is the grpc.ServiceDesc for PingPongService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -169,6 +285,16 @@ var PingPongService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 			ClientStreams: true,
 		},
+		{
+			StreamName:    "ReceivePongStream",
+			Handler:       _PingPongService_ReceivePongStream_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "PingAndStreamPong",
+			Handler:       _PingPongService_PingAndStreamPong_Handler,
+			ServerStreams: true,
+		},
 	},
-	Metadata: "proto/pingpong.proto",
+	Metadata: "pingpong.proto",
 }
