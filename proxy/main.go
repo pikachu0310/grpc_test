@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	pingpong "github.com/pikachu0310/grpc_test/server/proto"
+	pingpong "github.com/pikachu0310/grpc_test/proxy/proto"
 	"io"
 	"log"
 	"net/http"

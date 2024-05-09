@@ -1,6 +1,6 @@
 module github.com/pikachu0310/grpc_test/server
 
-go 1.21.4
+go 1.22.2
 
 require (
 	google.golang.org/grpc v1.63.2
