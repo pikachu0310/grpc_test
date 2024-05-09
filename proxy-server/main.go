@@ -126,7 +126,7 @@ func handleServerStreamingReceivePongStream(w http.ResponseWriter, r *http.Reque
 }
 
 func handleServerStreamingPingAndStreamPong(w http.ResponseWriter, r *http.Request) {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("https://pikachu-grpc-test.trap.show/grpc", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		http.Error(w, "Failed to connect to gRPC server: "+err.Error(), http.StatusInternalServerError)
 		return
