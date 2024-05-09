@@ -2,7 +2,8 @@ const grpc = require('grpc-web');
 const { Empty, Ping } = require('./pingpong_pb.js');
 const { PingPongServiceClient } = require('./pingpong_grpc_web_pb.js');
 
-const client = new PingPongServiceClient('http://localhost:8080', null, null);
+const serverUrl = process.env.GRPC_SERVER_URL || 'http://localhost:8080';
+const client = new PingPongServiceClient(serverUrl, null, null);
 
 function listenForPongs() {
   const emptyRequest = new Empty();

@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');  // webpackをインポート
+const dotenv = require('dotenv');
 
 module.exports = {
   mode: 'development',
@@ -31,6 +32,10 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+      'process.env.GRPC_SERVER_URL': JSON.stringify(process.env.GRPC_SERVER_URL)
+    }),
+    new webpack.DefinePlugin({
+      'process.env.GRPC_SERVER_URL': JSON.stringify(process.env.GRPC_SERVER_URL)
     })
   ]
 };
